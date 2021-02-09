@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ToDoListMvc.Data;
 using Microsoft.EntityFrameworkCore;
+using ToDoListMvc.Repositories;
 
 namespace ToDoListMvc
 {
@@ -26,8 +27,10 @@ namespace ToDoListMvc
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            services.AddDbContext<GoalContext>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("GoalContext")));
+            services.AddDbContext<GoalContext>(options => options.UseSqlServer(Configuration.GetConnectionString("GoalContext")));
+            services.AddTransient<IGoalRepository, GoalRepository>();
+            //services.AddTransient(typeof(IGoalRepository), typeof(GoalRepository));
+            //services.AddScoped<GoalRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -46,9 +49,7 @@ namespace ToDoListMvc
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
-            app.UseRouting();
-
-            app.UseAuthorization();
+            app.UseRouting();   
 
             app.UseEndpoints(endpoints =>
             {

@@ -7,73 +7,50 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ToDoListMvc.Data;
 using ToDoListMvc.Models;
+using ToDoListMvc.Repositories;
 
 namespace ToDoListMvc.Controllers
 {
     public class GoalsController : Controller
     {
-        private readonly GoalContext _context;
+        private IGoalRepository goalRepository;
 
-        public GoalsController(GoalContext context)
+        public GoalsController(IGoalRepository goalRepository)
         {
-            _context = context;
+            this.goalRepository = goalRepository;
         }
 
         // GET: Goals
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            return View(await _context.Goal.ToListAsync());
+            return View(goalRepository.Get());
         }
 
-        // GET: Goals/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var goal = await _context.Goal
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (goal == null)
-            {
-                return NotFound();
-            }
-
-            return View(goal);
-        }
-
-        // GET: Goals/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
+        
 
         // POST: Goals/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Text,Done")] Goal goal)
+        public IActionResult Create(Goal goal)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(goal);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                goalRepository.Create(goal);
+                goalRepository.Update(goal);
             }
-            return View(goal);
+                return RedirectToAction("Index");
         }
 
         // GET: Goals/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public IActionResult Edit(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
-
-            var goal = await _context.Goal.FindAsync(id);
+            var goal = goalRepository.FindById(id);
             if (goal == null)
             {
                 return NotFound();
@@ -86,8 +63,9 @@ namespace ToDoListMvc.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Text,Done")] Goal goal)
+        public IActionResult Edit(int id, Goal goal)
         {
+
             if (id != goal.Id)
             {
                 return NotFound();
@@ -95,59 +73,44 @@ namespace ToDoListMvc.Controllers
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(goal);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!GoalExists(goal.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                goalRepository.Update(goal);
                 return RedirectToAction(nameof(Index));
             }
             return View(goal);
         }
 
         // GET: Goals/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public IActionResult Delete(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var goal = await _context.Goal
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var goal = goalRepository.FindById(id);
+            
             if (goal == null)
             {
                 return NotFound();
             }
-
-            return View(goal);
-        }
-
-        // POST: Goals/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var goal = await _context.Goal.FindAsync(id);
-            _context.Goal.Remove(goal);
-            await _context.SaveChangesAsync();
+            goalRepository.Remove(goal);
             return RedirectToAction(nameof(Index));
+            
         }
 
-        private bool GoalExists(int id)
-        {
-            return _context.Goal.Any(e => e.Id == id);
-        }
+        //// POST: Goals/Delete/5
+        //[HttpPost, ActionName("Delete")]
+        //[ValidateAntiForgeryToken]
+        //public IActionResult DeleteConfirmed(int? id)
+        //{
+        //    var goal = goalRepository.FindById(id);
+        //    //var goal = await context.Goal.FindAsync(id);
+        //    //context.Goal.Remove(goal);
+        //    goalRepository.Remove(goal);
+        //    goalRepository.Update(goal);
+        //    //await context.SaveChangesAsync();
+        //    return RedirectToAction(nameof(Index));
+        //}
     }
 }
+

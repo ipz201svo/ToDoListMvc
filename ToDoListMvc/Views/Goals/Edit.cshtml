@@ -14,9 +14,13 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
-                <label asp-for="Text" class="control-label"></label>
-                <input asp-for="Text" class="form-control" />
+                @*<label asp-for="Text" class="control-label"></label>*@
+                @*<input asp-for="Text" class="form-control" />*@
+                @Html.LabelFor(a => a.Text, new { })
+                @Html.TextBoxFor(a => a.Text, new { @class="form-control"})
+                @*@Html.EditorFor()*@
                 <span asp-validation-for="Text" class="text-danger"></span>
+                @*@Html.ValidationMessageFor()*@
             </div>
             <div class="form-group form-check">
                 <label class="form-check-label">

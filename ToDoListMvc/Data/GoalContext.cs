@@ -14,6 +14,6 @@ namespace ToDoListMvc.Data
         {
         }
 
-        public DbSet<Goal> Goal { get; set; }
+        public DbSet<Goal> Goals { get; set; }
     }
 }

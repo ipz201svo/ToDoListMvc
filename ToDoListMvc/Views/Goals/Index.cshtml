@@ -7,12 +7,23 @@
 <h1>List of things to do</h1>
 
 <p>
-    <a asp-action="Create">Create a new task</a>
+
+    @*<a asp-action="Create">Create a new task</a>*@
+    @using (Html.BeginForm("Create", "Goals"))
+    {
+        @Html.TextBox("Text", "", new { @class = "form-controller" });
+        <div class="form-group">
+            <input type="submit" value="Add Goal" class="btn btn-primary" />
+        </div>
+    }
+
+
 </p>
 <table class="table">
     <thead>
         <tr>
             <th>
+
                 @Html.DisplayNameFor(model => model.Done)
             </th>
             <th>
@@ -24,43 +35,62 @@
     <tbody>
         @foreach (var item in Model)
         {
-            @if (item.Done == false)
+            @using (Html.BeginForm("Edit", "Goal", FormMethod.Get, new { name = ("tickForm" + item.Id.ToString())  }))
             {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Done)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Text)
-                    </td>
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                        @*<a asp-action="Details" asp-route-id="@item.Id">Details</a> |*@
-                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                    </td>
-                </tr>
+                @if (!item.Done)
+                {
+                    <tr>
+                        <td>
+                            @*@Html.DisplayFor(modelItem => item.Done)*@
+                            @Html.CheckBoxFor((modelItem) => item.Done, new { id = item.Id.ToString(), @class = "form-check-input" })
+
+
+                            @*<input type="checkbox" id="Done" class="form-check-input" asp-for="@item.Done" />*@
+
+
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Text)
+                        </td>
+                        <td>
+
+                            @*<a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |*@
+                            @Html.ActionLink("Edit", "Edit", new { item.Id }) |
+
+                            @*<a asp-action="Details" asp-route-id="@item.Id">Details</a> |*@
+                            @*<a asp-action="Delete" asp-route-id="@item.Id">Delete</a>*@
+                            @Html.ActionLink("Delete", "Delete", new { item.Id })
+                        </td>
+                    </tr>
+                }
             }
         }
 
         @foreach (var item in Model)
         {
-            @if (item.Done == true)
+            @if (item.Done)
             {
 
                 <tr>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Done)
+                        @*@Html.DisplayFor(modelItem => item.Done)*@
+                        @Html.CheckBoxFor((modelItem) => item.Done, new { id = item.Id.ToString(), @class = "form-check-input" })
+
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Text)
                     </td>
                     <td>
-                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                        @*<a asp-action="Details" asp-route-id="@item.Id">Details</a> |*@
-                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                        @*<a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>*@
+                        @Html.ActionLink("Edit", "Edit", new { item.Id }) |
+
+                        @Html.ActionLink("Delete", "Delete", new { item.Id })
+
                     </td>
                 </tr>
             }
         }
     </tbody>
 </table>
+
